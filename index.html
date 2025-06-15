@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rezept- & Nährwert-Tool - Pflegeheim</title>
+    <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background: linear-gradient(135deg, #f8fbff 0%, #e8f4f8 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); /* Blue theme for this tool */
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .nav-tab {
+            flex: 1;
+            padding: 15px;
+            background: #ecf0f1;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            color: #34495e;
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+        }
+        
+        .nav-tab:hover:not(.active) {
+            background: #d5dbdb;
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Card Style */
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-left: 5px solid #3498db;
+        }
+        
+        .card h2 {
+            color: #2980b9;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        /* Input Group */
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        
+        .input-group input, 
+        .input-group select, 
+        .input-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .input-group input:focus, 
+        .input-group select:focus, 
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #7f8c8d 0%, #95a5a6 100%);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(127, 140, 141, 0.3);
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .data-table th {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+            vertical-align: top;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .data-table tr:hover {
+            background-color: #e8f4f8;
+        }
+
+        /* Specific styles for recipe creation */
+        #ingredientsList {
+            margin-top: 20px;
+        }
+        
+        .ingredient-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 50px; /* Name, Menge, Einheit, Preis, Delete */
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px dashed #ccc;
+        }
+
+        .ingredient-item:last-child {
+            border-bottom: none;
+        }
+
+        .ingredient-item input, .ingredient-item select {
+            width: auto; /* Allow items to size based on content */
+            min-width: 80px; /* Minimum width for inputs */
+        }
+
+        .ingredient-item .btn-danger {
+            margin: 0;
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+
+        /* Summary Boxes */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+            background: #eaf6fc;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #cceeff;
+        }
+        
+        .summary-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .summary-item strong {
+            display: block;
+            font-size: 1.1em;
+            color: #2980b9;
+            margin-bottom: 5px;
+        }
+        
+        .summary-item span {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #34495e;
+        }
+
+        /* Recipe Detail View */
+        #recipeDetailView {
+            background: #fdfdfd;
+            border: 1px solid #eee;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        #recipeDetailView h3 {
+            color: #2980b9;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+        }
+
+        #recipeDetailView p {
+            margin-bottom: 8px;
+        }
+
+        #recipeDetailView ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        #recipeDetailView ul li {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+
+        #recipeTextOutput {
+            width: 100%;
+            height: 300px;
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1em;
+            white-space: pre-wrap; /* Preserve whitespace and line breaks, wrap long lines */
+            overflow: auto;
+            background-color: #fdfdfd;
+        }
+
+        /* Menu Planner Specific Styles */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr repeat(4, minmax(150px, 1fr)); /* Day | Breakfast | Lunch | Dinner | Snacks */
+            gap: 1px; /* Minimal gap for table-like appearance */
+            background-color: #ddebf2; /* Light border effect */
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .menu-grid-header, .menu-grid-cell {
+            padding: 12px 10px;
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .menu-grid-header {
+            background: linear-gradient(135deg, #5a6b7f 0%, #4a5c6e 100%);
+            color: white;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+
+        .menu-grid-cell select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 0.9em;
+            background-color: #fcfcfc;
+        }
+
+        .menu-day-label {
+            background-color: #eaf6fc;
+            font-weight: bold;
+            color: #34495e;
+            justify-content: flex-start;
+            padding-left: 15px;
+        }
+
+        #shoppingListOutput, #weeklyNutritionOutput {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fdfdfd;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            display: none; /* Hidden by default */
+        }
+
+        #shoppingListOutput h3, #weeklyNutritionOutput h3 {
+            color: #2980b9;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+        }
+
+        #shoppingListOutput ul, #weeklyNutritionOutput ul {
+            list-style-type: disc;
+            padding-left: 25px;
+        }
+
+        #shoppingListOutput li, #weeklyNutritionOutput li {
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: #34495e;
+            color: white;
+            border-radius: 10px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-direction: column;
+            }
+            .ingredient-item {
+                grid-template-columns: 1fr; /* Stack items on small screens */
+            }
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+            .btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+            .menu-grid {
+                grid-template-columns: 1fr; /* Stack on small screens for better readability */
+                display: block; /* Change to block to allow stacking */
+            }
+            .menu-grid-header, .menu-grid-cell {
+                justify-content: flex-start; /* Align text left when stacked */
+                padding: 10px;
+            }
+            .menu-grid-header {
+                background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%); /* Reapply header style when stacked */
+            }
+            .menu-day-label {
+                background-color: #cceeff; /* Different background for day label when stacked */
+                color: #2c3e50;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍳 Rezept- & Nährwert-Tool</h1>
+            <p>Für die einfache Verwaltung von Rezepten, Nährwerten und Kosten im Pflegeheim</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('manage-food')">🍎 Lebensmittel verwalten</button>
+            <button class="nav-tab" onclick="switchTab('create-recipe')">➕ Rezept erstellen</button>
+            <button class="nav-tab" onclick="switchTab('view-recipes')">📋 Gespeicherte Rezepte</button>
+            <button class="nav-tab" onclick="switchTab('plan-menu')">🗓️ Menüplan erstellen</button>
+        </div>
+
+        <div id="manage-food" class="tab-content active">
+            <div class="card">
+                <h2>Lebensmitteldatenbank verwalten</h2>
+                <div class="input-group">
+                    <label for="food-category">Kategorie:</label>
+                    <select id="food-category">
+                        <option value="Fleisch & Geflügel">Fleisch & Geflügel</option>
+                        <option value="Fisch & Meeresfrüchte">Fisch & Meeresfrüchte</option>
+                        <option value="Gemüse">Gemüse</option>
+                        <option value="Obst">Obst</option>
+                        <option value="Milchprodukte & Eier">Milchprodukte & Eier</option>
+                        <option value="Sättigungsbeilagen">Sättigungsbeilagen</option>
+                        <option value="Trockenprodukte & Hülsenfrüchte">Trockenprodukte & Hülsenfrüchte</option>
+                        <option value="Fette & Öle">Fette & Öle</option>
+                        <option value="Getränke">Getränke (Basiszutaten)</option>
+                        <option value="Konserven & Gläser">Konserven & Gläser</option>
+                        <option value="Tiefkühlprodukte">Tiefkühlprodukte</option>
+                        <option value="Soßen, Dressings & Würzmittel">Soßen, Dressings & Würzmittel</option>
+                        <option value="Sonstiges">Sonstiges</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="food-name">Lebensmittelname:</label>
+                    <input type="text" id="food-name" placeholder="z.B. Hähnchenbrustfilet, Kartoffel">
+                </div>
+                <div class="input-group">
+                    <label for="food-unit">Bevorzugte Einheit für Eingabe:</label>
+                    <select id="food-unit">
+                        <option value="gram">Gramm (g)</option>
+                        <option value="kilogram">Kilogramm (kg)</option>
+                        <option value="liter">Liter (L)</option>
+                        <option value="milliliter">Milliliter (ml)</option>
+                        <option value="stueck">Stück</option>
+                    </select>
+                </div>
+                <div class="input-group" id="food-weight-per-piece-group" style="display:none;">
+                    <label for="food-weight-per-piece">Durchschnittsgewicht pro Stück (in Gramm):</label>
+                    <input type="number" id="food-weight-per-piece" step="0.1" placeholder="z.B. 150 (für einen Apfel)">
+                </div>
+                <h3>Nährwerte pro 100g/ml:</h3>
+                <div class="input-group">
+                    <label for="food-calories">Kalorien (kcal):</label>
+                    <input type="number" id="food-calories" step="0.1" placeholder="z.B. 120">
+                </div>
+                <div class="input-group">
+                    <label for="food-protein">Protein (g):</label>
+                    <input type="number" id="food-protein" step="0.1" placeholder="z.B. 25">
+                </div>
+                <div class="input-group">
+                    <label for="food-carbs">Kohlenhydrate (g):</label>
+                    <input type="number" id="food-carbs" step="0.1" placeholder="z.B. 0">
+                </div>
+                <div class="input-group">
+                    <label for="food-fat">Fett (g):</label>
+                    <input type="number" id="food-fat" step="0.1" placeholder="z.B. 2">
+                </div>
+                <button class="btn btn-primary" onclick="addOrUpdateFood()">Lebensmittel speichern</button>
+                <button class="btn btn-secondary" onclick="clearFoodForm()">Formular leeren</button>
+
+                <h3 style="margin-top: 30px;">Vorhandene Lebensmittel:</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Kategorie</th>
+                            <th>Name</th>
+                            <th>Einheit</th>
+                            <th>Gewicht/Stück (g)</th>
+                            <th>kcal/100</th>
+                            <th>Protein/100</th>
+                            <th>KH/100</th>
+                            <th>Fett/100</th>
+                            <th>Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody id="foodTableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="create-recipe" class="tab-content">
+            <div class="card">
+                <h2>Neues Rezept erstellen</h2>
+                <div class="input-group">
+                    <label for="recipe-name">Rezeptname:</label>
+                    <input type="text" id="recipe-name" placeholder="z.B. Hähnchen-Gemüse-Curry">
+                </div>
+                <div class="input-group">
+                    <label for="recipe-portions">Anzahl der Portionen:</label>
+                    <input type="number" id="recipe-portions" min="1" value="1" onchange="calculateRecipeTotals()">
+                </div>
+
+                <h3>Zutaten hinzufügen:</h3>
+                <div class="input-group">
+                    <label for="ingredient-select">Zutat auswählen:</label>
+                    <select id="ingredient-select" onchange="updateIngredientUnit()">
+                        <option value="">-- Lebensmittel auswählen --</option>
+                        </select>
+                </div>
+                <div class="ingredient-input-row" style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <div style="flex: 1;">
+                        <label for="ingredient-quantity">Menge:</label>
+                        <input type="number" id="ingredient-quantity" step="0.01" placeholder="Menge" oninput="calculateRecipeTotals()">
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="ingredient-unit">Einheit:</label>
+                        <select id="ingredient-unit" onchange="calculateRecipeTotals()">
+                            <option value="gram">Gramm</option>
+                            <option value="kilogram">Kilogramm</option>
+                            <option value="liter">Liter</option>
+                            <option value="milliliter">Milliliter</option>
+                            <option value="stueck">Stück</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="ingredient-price">Preis pro Einheit (€):</label>
+                        <input type="number" id="ingredient-price" step="0.01" placeholder="z.B. 1.50 (pro kg/L/Stück)" oninput="calculateRecipeTotals()">
+                    </div>
+                </div>
+                <button class="btn btn-success" onclick="addIngredient()">Zutat hinzufügen</button>
+
+                <div id="ingredientsList">
+                    <h3>Aktuelle Zutatenliste:</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Lebensmittel</th>
+                                <th>Menge</th>
+                                <th>Einheit</th>
+                                <th>Kosten (€)</th>
+                                <th>kcal</th>
+                                <th>Protein (g)</th>
+                                <th>KH (g)</th>
+                                <th>Fett (g)</th>
+                                <th>Aktionen</th>
+                            </tr>
+                        </thead>
+                        <tbody id="currentIngredientsTableBody">
+                            </tbody>
+                    </table>
+                </div>
+
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <strong>Gesamtkosten:</strong>
+                        <span id="total-cost">0.00 €</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Kosten pro Portion:</strong>
+                        <span id="cost-per-portion">0.00 €</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Gesamt Kalorien:</strong>
+                        <span id="total-calories">0 kcal</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Kalorien pro Portion:</strong>
+                        <span id="calories-per-portion">0 kcal</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Gesamt Protein:</strong>
+                        <span id="total-protein">0 g</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Protein pro Portion:</strong>
+                        <span id="protein-per-portion">0 g</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Gesamt Kohlenhydrate:</strong>
+                        <span id="total-carbs">0 g</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Kohlenhydrate pro Portion:</strong>
+                        <span id="carbs-per-portion">0 g</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Gesamt Fett:</strong>
+                        <span id="total-fat">0 g</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Fett pro Portion:</strong>
+                        <span id="fat-per-portion">0 g</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="saveRecipe()" style="margin-top: 20px;">💾 Rezept speichern</button>
+            </div>
+        </div>
+
+        <div id="view-recipes" class="tab-content">
+            <div class="card">
+                <h2>Gespeicherte Rezepte</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Rezeptname</th>
+                            <th>Portionen</th>
+                            <th>Gesamtkosten</th>
+                            <th>Kosten/Portion</th>
+                            <th>kcal/Portion</th>
+                            <th>Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody id="savedRecipesTableBody">
+                        </tbody>
+                </table>
+                <div id="recipeDetailView" style="display:none;">
+                    <h3>Rezeptdetails: <span id="detailRecipeName"></span></h3>
+                    <p><strong>Portionen:</strong> <span id="detailPortions"></span></p>
+                    <p><strong>Gesamtkosten:</strong> <span id="detailTotalCost"></span></p>
+                    <p><strong>Kosten pro Portion:</strong> <span id="detailCostPerPortion"></span></p>
+                    
+                    <h4>Nährwerte gesamt:</h4>
+                    <ul>
+                        <li>Kalorien: <span id="detailTotalCalories"></span> kcal</li>
+                        <li>Protein: <span id="detailTotalProtein"></span> g</li>
+                        <li>Kohlenhydrate: <span id="detailTotalCarbs"></span> g</li>
+                        <li>Fett: <span id="detailTotalFat"></span> g</li>
+                    </ul>
+
+                    <h4>Nährwerte pro Portion:</h4>
+                    <ul>
+                        <li>Kalorien: <span id="detailCaloriesPerPortion"></span> kcal</li>
+                        <li>Protein: <span id="detailProteinPerPortion"></span> g</li>
+                        <li>Kohlenhydrate: <span id="detailCarbsPerPortion"></span> g</li>
+                        <li>Fett: <span id="detailFatPerPortion"></span> g</li>
+                    </ul>
+
+                    <h4>Zutaten:</h4>
+                    <ul id="detailIngredientsList">
+                        </ul>
+                    <button class="btn btn-secondary" onclick="hideRecipeDetails()">Details schließen</button>
+                    <button class="btn btn-success" onclick="exportRecipeText()">Rezept als Text exportieren</button>
+                    <textarea id="recipeTextOutput" readonly style="display:none;"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div id="plan-menu" class="tab-content">
+            <div class="card">
+                <h2>Wöchentlichen Menüplan erstellen</h2>
+                <div class="input-group">
+                    <label for="num-residents">Anzahl der Bewohner:</label>
+                    <input type="number" id="num-residents" min="1" value="10" onchange="updateMenuCalculations()">
+                </div>
+                <div class="input-group">
+                    <label for="menu-plan-name">Name des Menüplans (optional):</label>
+                    <input type="text" id="menu-plan-name" placeholder="z.B. KW 24 Standard-Menü">
+                </div>
+                <button class="btn btn-primary" onclick="saveMenuPlan()">Menüplan speichern</button>
+                <button class="btn btn-secondary" onclick="loadMenuPlanList()">Gespeicherte Pläne laden</button>
+                <button class="btn btn-danger" onclick="clearMenuPlan()">Menüplan leeren</button>
+                
+                <div id="savedMenuPlanList" class="card" style="display:none; margin-top: 20px;">
+                    <h3>Gespeicherte Menüpläne:</h3>
+                    <ul id="menuPlanList" style="list-style-type: none; padding-left: 0;"></ul>
+                    <button class="btn btn-secondary" onclick="document.getElementById('savedMenuPlanList').style.display = 'none'">Schließen</button>
+                </div>
+
+                <h3 style="margin-top: 30px;">Wochenübersicht:</h3>
+                <div class="menu-grid">
+                    <div class="menu-grid-header">Tag</div>
+                    <div class="menu-grid-header">Frühstück</div>
+                    <div class="menu-grid-header">Mittagessen</div>
+                    <div class="menu-grid-header">Abendessen</div>
+                    <div class="menu-grid-header">Snacks</div>
+
+                    <div class="menu-day-label">Montag</div>
+                    <div class="menu-grid-cell"><select id="mon-breakfast" onchange="updateMenuCalculations()"></select></div>
+                    <div class="menu-grid-cell"><select id="mon-lunch" onchange="updateMenuCalculations()"></select></div>
+                    <div class="menu-grid-cell"><select id="mon-dinner" onchange="updateMenuCalculations()"></select></div>
+                    <div class="menu-grid-cell"><select id="mon-snacks" onchange="updateMenuCalculations()"></select></div>
+
+                    <div class="menu-day-label">Dienstag</div>
+                    <div class="menu-grid-cell"><select id="tue-breakfast" onchange="updateMenuCalculations()"></select></div>
+                    <div class="menu-grid-cell"><select id="tue-lunch" onchange="updateMenuCalculations()"></select></div>
+                    <div class="menu-grid-cell"><select id="tue-dinner" onchange="updateMenuCalculations()"></select></div>
+                    <div class="menu-grid-cell"><select id="tue-snacks" onchange="updateMenuCalculations()"></select></div>
+
+                    <div class="menu-day-label">Mittwoch</div>
+                    <div class="menu-grid-cell"><select id="wed-breakfast" onchange="updateMenuCalculations()"></select></div>
+                    <div class="menu-grid-cell"><select id="wed-lunch" onchange="updateMenuCalculations()"></select></div>
+                    <div class="menu-grid-cell"><select id="wed-dinner" onchange="updateMenuCalculations()"></select></div>
+                    <div class="menu-grid-cell"><select id="wed-snacks" onchange="updateMenuCalculations()"></select></div>
+
+                    <div class="menu-day-label">Donnerstag</div>
+                    <div class="menu-grid-cell"><select id="thu-breakfast" onchange="updateMenuCalculations()"></select></div>
+                    <div class="menu-grid-cell"><select id="thu-lunch" onchange="updateMenuCalculations()"></select></div>
+                    <div class="menu-grid-cell"><select id="thu-dinner" onchange="updateMenuCalculations()"></select></div>
+                    <div class="menu-grid-cell"><select id="thu-snacks" onchange="updateMenuCalculations()"></select></div>
+
+                    <div class="menu-day-label">Freitag</div>
+                    <div class="menu-grid-cell"><select id="fri-breakfast" onchange="updateMenuCalculations()"></select></div>
+                    <div class="menu-grid-cell"><select id="fri-lunch" onchange="updateMenuCalculations()"></select></div>
+                    <div class="menu-grid-cell"><select id="fri-dinner" onchange="updateMenuCalculations()"></select></div>
+                    <div class="menu-grid-cell"><select id="fri-snacks" onchange="updateMenuCalculations()"></select></div>
+
+                    <div class="menu-day-label">Samstag</div>
+                    <div class="menu-grid-cell"><select id="sat-breakfast" onchange="updateMenuCalculations()"></select></div>
+                    <div class="menu-grid-cell"><select id="sat-lunch" onchange="updateMenuCalculations()"></select></div>
+                    <div class="menu-grid-cell"><select id="sat-dinner" onchange="updateMenuCalculations()"></select></div>
+                    <div class="menu-grid-cell"><select id="sat-snacks" onchange="updateMenuCalculations()"></select></div>
+
+                    <div class="menu-day-label">Sonntag</div>
+                    <div class="menu-grid-cell"><select id="sun-breakfast" onchange="updateMenuCalculations()"></select></div>
+                    <div class="menu-grid-cell"><select id="sun-lunch" onchange="updateMenuCalculations()"></select></div>
+                    <div class="menu-grid-cell"><select id="sun-dinner" onchange="updateMenuCalculations()"></select></div>
+                    <div class="menu-grid-cell"><select id="sun-snacks" onchange="updateMenuCalculations()"></select></div>
+                </div>
+
+                <h3 style="margin-top: 30px;">Wöchentliche Übersichten:</h3>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <strong>Gesamtkosten Woche:</strong>
+                        <span id="weekly-total-cost">0.00 €</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Gesamt Kalorien Woche:</strong>
+                        <span id="weekly-total-calories">0 kcal</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Gesamt Protein Woche:</strong>
+                        <span id="weekly-total-protein">0 g</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Gesamt Kohlenhydrate Woche:</strong>
+                        <span id="weekly-total-carbs">0 g</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Gesamt Fett Woche:</strong>
+                        <span id="weekly-total-fat">0 g</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Durchschnitt kcal/Bewohner/Tag:</strong>
+                        <span id="avg-daily-calories-resident">0 kcal</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Durchschnitt Protein/Bewohner/Tag:</strong>
+                        <span id="avg-daily-protein-resident">0 g</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Durchschnitt KH/Bewohner/Tag:</strong>
+                        <span id="avg-daily-carbs-resident">0 g</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Durchschnitt Fett/Bewohner/Tag:</strong>
+                        <span id="avg-daily-fat-resident">0 g</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-success" style="margin-top: 20px;" onclick="generateShoppingList()">Einkaufsliste generieren</button>
+                
+                <div id="shoppingListOutput" class="card">
+                    <h3>Einkaufsliste für die Woche</h3>
+                    <ul id="generatedShoppingList"></ul>
+                    <button class="btn btn-secondary" onclick="document.getElementById('shoppingListOutput').style.display = 'none'">Einkaufsliste schließen</button>
+                    <button class="btn btn-success" onclick="exportShoppingListText()">Einkaufsliste als Text exportieren</button>
+                    <textarea id="shoppingListTextOutput" readonly style="display:none; width: 100%; height: 200px; margin-top: 10px;"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 Rezept- & Nährwert-Tool - Pflegeheim</p>
+        </div>
+    </div>
+
+    <script>
+        // Global variables for data storage (using localStorage for persistence)
+        let FOOD_DATABASE = JSON.parse(localStorage.getItem('foodDatabase')) || [
+            // --- Fleisch & Geflügel ---
+            { id: 'f_rindhack_mager', category: 'Fleisch & Geflügel', name: 'Rinderhackfleisch (mager, ca. 5% Fett)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 120, protein: 25, carbs: 0, fat: 2.5 },
+            { id: 'f_haehnchenbrustfilet', category: 'Fleisch & Geflügel', name: 'Hähnchenbrustfilet', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 165, protein: 31, carbs: 0, fat: 3.6 },
+            { id: 'f_schweineschnitzel_mager', category: 'Fleisch & Geflügel', name: 'Schweineschnitzel (mager)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 130, protein: 21, carbs: 0, fat: 5 },
+            { id: 'f_putenfleisch_brust', category: 'Fleisch & Geflügel', name: 'Putenfleisch (Brust ohne Haut)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 107, protein: 23, carbs: 0, fat: 1.6 },
+            { id: 'f_rindfleisch_gulasch', category: 'Fleisch & Geflügel', name: 'Rindergulasch', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 150, protein: 20, carbs: 0, fat: 7.5 },
+            { id: 'f_schweineruecken', category: 'Fleisch & Geflügel', name: 'Schweinerücken', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 143, protein: 22, carbs: 0, fat: 6 },
+            { id: 'f_schweinenacken', category: 'Fleisch & Geflügel', name: 'Schweinenacken', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 247, protein: 17, carbs: 0, fat: 19 },
+            { id: 'f_bratwurst_grob', category: 'Fleisch & Geflügel', name: 'Bratwurst (grob)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 330, protein: 14.7, carbs: 0.1, fat: 28.9 },
+            { id: 'f_bratwurst_fein', category: 'Fleisch & Geflügel', name: 'Bratwurst (fein)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 251, protein: 11, carbs: 0.8, fat: 22.7 },
+            { id: 'f_hackfleisch_gemischt', category: 'Fleisch & Geflügel', name: 'Hackfleisch (gemischt)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 221, protein: 19, carbs: 0, fat: 16 },
+            { id: 'f_sauerbraten', category: 'Fleisch & Geflügel', name: 'Sauerbraten', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 140, protein: 20, carbs: 5, fat: 5 }, // Durchschnittswert, da Zubereitung variiert
+            { id: 'f_rindfleisch_tafelspitz', category: 'Fleisch & Geflügel', name: 'Rindfleisch (Tafelspitz)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 167, protein: 21, carbs: 0, fat: 9.1 },
+            { id: 'f_rindfleisch_falschesfilet', category: 'Fleisch & Geflügel', name: 'Rindfleisch (falsches Filet)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 111, protein: 21, carbs: 0, fat: 3 },
+            { id: 'f_hackbaellchen_tk', category: 'Fleisch & Geflügel', name: 'Hackbällchen (TK)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 105, protein: 6, carbs: 13, fat: 3.1 },
+            { id: 'f_speckwuerfel_durchwachsen', category: 'Fleisch & Geflügel', name: 'Speckwürfel (durchwachsen)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 450, protein: 15, carbs: 0.5, fat: 42 },
+            { id: 'f_speck_stueck_durchwachsen', category: 'Fleisch & Geflügel', name: 'Speck (Stück, durchwachsen)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 450, protein: 15, carbs: 0.5, fat: 42 },
+
+            // --- Fisch & Meeresfrüchte ---
+            { id: 'fi_lachsfilet', category: 'Fisch & Meeresfrüchte', name: 'Lachsfilet', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 208, protein: 20, carbs: 0, fat: 13 },
+            { id: 'fi_kabeljaufilet', category: 'Fisch & Meeresfrüchte', name: 'Kabeljaufilet', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 82, protein: 18, carbs: 0, fat: 0.7 },
+            { id: 'fi_garnelen', category: 'Fisch & Meeresfrüchte', name: 'Garnelen (roh)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 85, protein: 18, carbs: 0.9, fat: 0.3 },
+            { id: 'fi_thunfisch_dose_wasser', category: 'Fisch & Meeresfrüchte', name: 'Thunfisch (Dose, im eigenen Saft)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 116, protein: 25, carbs: 0, fat: 1.5 },
+
+            // --- Gemüse ---
+            { id: 'g_karotte', category: 'Gemüse', name: 'Karotte', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 41, protein: 0.9, carbs: 9.6, fat: 0.2 },
+            { id: 'g_brokkoli', category: 'Gemüse', name: 'Brokkoli', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 34, protein: 2.8, carbs: 7.2, fat: 0.4 },
+            { id: 'g_zucchini', category: 'Gemüse', name: 'Zucchini', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 17, protein: 1.2, carbs: 3.1, fat: 0.3 },
+            { id: 'g_paprika_rot', category: 'Gemüse', name: 'Paprika (rot)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 31, protein: 1, carbs: 6, fat: 0.3 },
+            { id: 'g_zwiebel', category: 'Gemüse', name: 'Zwiebel', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 40, protein: 1.1, carbs: 9.3, fat: 0.1 },
+            { id: 'g_knoblauch', category: 'Gemüse', name: 'Knoblauch', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 149, protein: 6.4, carbs: 33.1, fat: 0.5 },
+            { id: 'g_blumenkohl', category: 'Gemüse', name: 'Blumenkohl', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 25, protein: 1.9, carbs: 5, fat: 0.3 },
+            { id: 'g_salatgurke', category: 'Gemüse', name: 'Salatgurke', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 15, protein: 0.7, carbs: 3.6, fat: 0.1 },
+            { id: 'g_tomate', category: 'Gemüse', name: 'Tomate', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 18, protein: 0.9, carbs: 3.9, fat: 0.2 },
+            { id: 'g_spinat_frisch', category: 'Gemüse', name: 'Spinat (frisch)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 23, protein: 2.9, carbs: 3.6, fat: 0.4 },
+            { id: 'g_rotkohl_konserve', category: 'Gemüse', name: 'Rotkohl (Konserve)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 40, protein: 1.5, carbs: 7.5, fat: 0.2 },
+            { id: 'g_sauerkraut', category: 'Gemüse', name: 'Sauerkraut', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 19, protein: 1.3, carbs: 3.2, fat: 0.2 },
+            { id: 'g_mais_konserve', category: 'Gemüse', name: 'Mais (Konserve)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 80, protein: 2.9, carbs: 11, fat: 1.9 },
+            { id: 'g_rosenkohl', category: 'Gemüse', name: 'Rosenkohl', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 36, protein: 4.45, carbs: 3.29, fat: 0.34 },
+            { id: 'g_kohlrabi', category: 'Gemüse', name: 'Kohlrabi', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 23, protein: 1.9, carbs: 3.7, fat: 0.1 },
+            { id: 'g_schwarzwurzel', category: 'Gemüse', name: 'Schwarzwurzel', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 25, protein: 1, carbs: 4, fat: 0 },
+            { id: 'g_gemuesebrunoise', category: 'Gemüse', name: 'Gemüsebrunoise', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 27, protein: 1, carbs: 3.6, fat: 0.4 }, // Durchschnittswert, da Mischung
+            { id: 'g_gemuesejulienne', category: 'Gemüse', name: 'Gemüsejulienne', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 32.4, protein: 1.3, carbs: 4.7, fat: 0.2 }, // Durchschnittswert, da Mischung
+            { id: 'g_paprika_rot_gewuerfelt_tk', category: 'Gemüse', name: 'Paprika (rot, gewürfelt, TK)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 37, protein: 1.1, carbs: 6.4, fat: 0.4 },
+            { id: 'g_paprika_rot_streifen', category: 'Gemüse', name: 'Paprika (rot, Streifen)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 36.4, protein: 1, carbs: 6.4, fat: 0.4 },
+            { id: 'g_zwiebeln_tk', category: 'Gemüse', name: 'Zwiebeln (TK)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 40, protein: 1.1, carbs: 9.3, fat: 0.1 },
+
+            // --- Obst ---
+            { id: 'o_apfel', category: 'Obst', name: 'Apfel (rot/grün)', preferredUnit: 'stueck', weightPerPieceInGram: 180, calories: 52, protein: 0.3, carbs: 14, fat: 0.2 },
+            { id: 'o_banane', category: 'Obst', name: 'Banane', preferredUnit: 'stueck', weightPerPieceInGram: 120, calories: 89, protein: 1.1, carbs: 23, fat: 0.3 },
+            { id: 'o_orange', category: 'Obst', name: 'Orange', preferredUnit: 'stueck', weightPerPieceInGram: 150, calories: 47, protein: 0.9, carbs: 11.8, fat: 0.1 },
+            { id: 'o_erdbeeren', category: 'Obst', name: 'Erdbeeren', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 32, protein: 0.7, carbs: 7.7, fat: 0.3 },
+            { id: 'o_trauben_rot', category: 'Obst', name: 'Trauben (rot)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 69, protein: 0.6, carbs: 18, fat: 0.2 },
+
+            // --- Milchprodukte & Eier ---
+            { id: 'm_vollmilch_3_5', category: 'Milchprodukte & Eier', name: 'Vollmilch 3.5%', preferredUnit: 'liter', weightPerPieceInGram: null, calories: 62, protein: 3.3, carbs: 4.8, fat: 3.5 },
+            { id: 'm_joghurt_natur_1_5', category: 'Milchprodukte & Eier', name: 'Naturjoghurt 1.5%', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 60, protein: 4.5, carbs: 5, fat: 1.5 },
+            { id: 'm_quark_magerstufe', category: 'Milchprodukte & Eier', name: 'Magerquark', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 66, protein: 12, carbs: 4, fat: 0.3 },
+            { id: 'm_butter', category: 'Milchprodukte & Eier', name: 'Butter', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 717, protein: 0.8, carbs: 0.1, fat: 81 },
+            { id: 'm_gouda_jung', category: 'Milchprodukte & Eier', name: 'Gouda (jung, 48% F.i.Tr.)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 356, protein: 25, carbs: 0, fat: 27 },
+            { id: 'm_eier_groesse_m', category: 'Milchprodukte & Eier', name: 'Ei (Größe M)', preferredUnit: 'stueck', weightPerPieceInGram: 58, calories: 155, protein: 12.6, carbs: 1.1, fat: 10.6 },
+            { id: 'm_sahne_30', category: 'Milchprodukte & Eier', name: 'Sahne (30% Fett)', preferredUnit: 'milliliter', weightPerPieceInGram: null, calories: 292, protein: 2.5, carbs: 3.2, fat: 30 },
+            { id: 'm_quark', category: 'Milchprodukte & Eier', name: 'Quark', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 97, protein: 10.3, carbs: 3.7, fat: 4.3 },
+            { id: 'm_joghurt', category: 'Milchprodukte & Eier', name: 'Joghurt', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 81, protein: 5.3, carbs: 5.8, fat: 4.1 },
+
+            // --- Sättigungsbeilagen ---
+            { id: 's_kartoffel', category: 'Sättigungsbeilagen', name: 'Kartoffel', preferredUnit: 'stueck', weightPerPieceInGram: 150, calories: 77, protein: 2, carbs: 17, fat: 0.1 },
+            { id: 's_nudeln_roh', category: 'Sättigungsbeilagen', name: 'Nudeln (roh)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 371, protein: 13, carbs: 74, fat: 1.5 },
+            { id: 's_reis_roh', category: 'Sättigungsbeilagen', name: 'Reis (roh, weiß)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 360, protein: 7.1, carbs: 79, fat: 0.7 },
+            { id: 's_brot_weizen', category: 'Sättigungsbeilagen', name: 'Weizenbrot', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 265, protein: 9, carbs: 50, fat: 3.2 },
+            { id: 's_vollkornbrot', category: 'Sättigungsbeilagen', name: 'Vollkornbrot', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 240, protein: 8, carbs: 45, fat: 2 },
+            { id: 's_kroketten', category: 'Sättigungsbeilagen', name: 'Kroketten', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 177, protein: 2.5, carbs: 25, fat: 7 }, // ungebacken
+            { id: 's_rosti_ecken', category: 'Sättigungsbeilagen', name: 'Rösti Ecken', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 180, protein: 2.5, carbs: 22, fat: 9 }, // Durchschnittswert
+            { id: 's_schupfnudeln', category: 'Sättigungsbeilagen', name: 'Schupfnudeln', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 200, protein: 4, carbs: 35, fat: 4 }, // Durchschnittswert
+
+            // --- Trockenprodukte & Hülsenfrüchte ---
+            { id: 't_weizenmehl_405', category: 'Trockenprodukte & Hülsenfrüchte', name: 'Weizenmehl (Type 405)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 364, protein: 10.3, carbs: 76.3, fat: 1.1 },
+            { id: 't_zucker', category: 'Trockenprodukte & Hülsenfrüchte', name: 'Zucker', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 400, protein: 0, carbs: 100, fat: 0 },
+            { id: 't_salz', category: 'Trockenprodukte & Hülsenfrüchte', name: 'Salz', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 0, protein: 0, carbs: 0, fat: 0 },
+            { id: 't_pfeffer_schwarz', category: 'Trockenprodukte & Hülsenfrüchte', name: 'Pfeffer (schwarz)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 251, protein: 10.4, carbs: 64, fat: 3.3 },
+            { id: 't_linsen_rot_roh', category: 'Trockenprodukte & Hülsenfrüchte', name: 'Rote Linsen (roh)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 352, protein: 24.6, carbs: 63, fat: 1.1 },
+            { id: 't_kichererbsen_roh', category: 'Trockenprodukte & Hülsenfrüchte', name: 'Kichererbsen (roh)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 364, protein: 20.5, carbs: 60.7, fat: 6 },
+            { id: 't_haferflocken', category: 'Trockenprodukte & Hülsenfrüchte', name: 'Haferflocken', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 389, protein: 13.5, carbs: 66, fat: 6.9 },
+
+            // --- Fette & Öle ---
+            { id: 'fo_sonnenblumenoel', category: 'Fette & Öle', name: 'Sonnenblumenöl', preferredUnit: 'milliliter', weightPerPieceInGram: null, calories: 884, protein: 0, carbs: 0, fat: 100 },
+            { id: 'fo_olivenoel', category: 'Fette & Öle', name: 'Olivenöl (nativ extra)', preferredUnit: 'milliliter', weightPerPieceInGram: null, calories: 884, protein: 0, carbs: 0, fat: 100 },
+            { id: 'fo_margarine_pflanzlich', category: 'Fette & Öle', name: 'Margarine (pflanzlich)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 717, protein: 0.5, carbs: 0.5, fat: 80 },
+
+            // --- Getränke (Basiszutaten) ---
+            { id: 'get_wasser', category: 'Getränke', name: 'Wasser', preferredUnit: 'liter', weightPerPieceInGram: null, calories: 0, protein: 0, carbs: 0, fat: 0 },
+            { id: 'get_kaffee_pulver', category: 'Getränke', name: 'Kaffee (Pulver)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 0, protein: 0, carbs: 0, fat: 0 }, // Nährwerte im zubereiteten Zustand irrelevant
+            { id: 'get_tee_schwarz_lose', category: 'Getränke', name: 'Tee (Schwarz, lose)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 0, protein: 0, carbs: 0, fat: 0 }, // Nährwerte im zubereiteten Zustand irrelevant
+
+            // --- Konserven & Gläser ---
+            { id: 'k_tomatenstuecke_dose', category: 'Konserven & Gläser', name: 'Tomatenstücke (Dose)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 20, protein: 1, carbs: 3.5, fat: 0.2 },
+            { id: 'k_passierte_tomaten', category: 'Konserven & Gläser', name: 'Passierte Tomaten', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 20, protein: 1, carbs: 3.5, fat: 0.2 },
+            { id: 'k_mais_dose', category: 'Konserven & Gläser', name: 'Mais (Dose, abgetropft)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 86, protein: 3.4, carbs: 19.3, fat: 1.2 },
+            { id: 'k_erbsen_dose', category: 'Konserven & Gläser', name: 'Erbsen (Dose, abgetropft)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 81, protein: 5.4, carbs: 14.5, fat: 0.4 },
+            { id: 'k_kidneybohnen_dose', category: 'Konserven & Gläser', name: 'Kidneybohnen (Dose, abgetropft)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 127, protein: 8.7, carbs: 22.8, fat: 0.5 },
+            { id: 'k_apfelmus_ungesuesst', category: 'Konserven & Gläser', name: 'Apfelmus (ungesüßt, Glas)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 68, protein: 0.3, carbs: 16.5, fat: 0.2 },
+
+            // --- Tiefkühlprodukte ---
+            { id: 'tk_gemuesemischung_standard', category: 'Tiefkühlprodukte', name: 'Tiefkühl-Gemüsemischung (z.B. Erbsen, Karotten, Blumenkohl)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 40, protein: 2.5, carbs: 7, fat: 0.5 },
+            { id: 'tk_spinat_portionierbar', category: 'Tiefkühlprodukte', name: 'Spinat (Tiefkühl, portioniert)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 23, protein: 2.9, carbs: 3.6, fat: 0.4 }, // Ähnlich wie frisch, aber typische Form
+            { id: 'tk_pommes', category: 'Tiefkühlprodukte', name: 'Pommes Frites (Tiefkühl)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 150, protein: 3, carbs: 25, fat: 4.5 }, // ungebacken
+            { id: 'tk_beerenmischung', category: 'Tiefkühlprodukte', name: 'Beerenmischung (Tiefkühl)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 45, protein: 1, carbs: 10, fat: 0.5 },
+            { id: 'tk_erbsen', category: 'Tiefkühlprodukte', name: 'Erbsen (TK)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 86, protein: 7.1, carbs: 12.7, fat: 0.5 },
+            { id: 'tk_rosenkohl', category: 'Tiefkühlprodukte', name: 'Rosenkohl (TK)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 36, protein: 4.45, carbs: 3.29, fat: 0.34 },
+
+
+            // --- Soßen, Dressings & Würzmittel ---
+            { id: 'sw_ketchup', category: 'Soßen, Dressings & Würzmittel', name: 'Ketchup', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 100, protein: 1.1, carbs: 23.2, fat: 0.3 },
+            { id: 'sw_mayonnaise', category: 'Soßen, Dressings & Würzmittel', name: 'Mayonnaise', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 742, protein: 1.4, carbs: 2.1, fat: 80 },
+            { id: 'sw_remoulade', category: 'Soßen, Dressings & Würzmittel', name: 'Remoulade', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 482, protein: 0.7, carbs: 6.4, fat: 50.1 },
+            { id: 'sw_senf_mittelscharf', category: 'Soßen, Dressings & Würzmittel', name: 'Senf (mittelscharf)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 100, protein: 5.5, carbs: 5.5, fat: 6 },
+            { id: 'sw_essig_apfel', category: 'Soßen, Dressings & Würzmittel', name: 'Apfelessig', preferredUnit: 'milliliter', weightPerPieceInGram: null, calories: 21, protein: 0, carbs: 0.9, fat: 0 },
+            { id: 'sw_sojasauce', category: 'Soßen, Dressings & Würzmittel', name: 'Sojasauce', preferredUnit: 'milliliter', weightPerPieceInGram: null, calories: 53, protein: 8, carbs: 4.9, fat: 0.6 },
+            { id: 'sw_gemuesebruehe_pulver', category: 'Soßen, Dressings & Würzmittel', name: 'Gemüsebrühe (Pulver)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 120, protein: 8, carbs: 12, fat: 2 }, // als Pulver, da dies die Basis für die Zubereitung ist
+            { id: 'sw_passierte_tomaten_fertig', category: 'Soßen, Dressings & Würzmittel', name: 'Fertige Tomatensoße', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 50, protein: 2, carbs: 8, fat: 1.5 }, // Beispiel für eine fertige Soße
+
+            // --- Sonstiges (für alles, was nicht passt) ---
+            { id: 's_frischkaese_natur', category: 'Sonstiges', name: 'Frischkäse (Natur, 0.2% Fett)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 55, protein: 11, carbs: 4, fat: 0.2 },
+            { id: 's_hefe_frisch', category: 'Sonstiges', name: 'Hefe (frisch)', preferredUnit: 'gram', weightPerPieceInGram: null, calories: 100, protein: 11, carbs: 7.5, fat: 1 },
+        ];
+        
+        let RECIPES = JSON.parse(localStorage.getItem('recipes')) || [];
+        let SAVED_MENU_PLANS = JSON.parse(localStorage.getItem('savedMenuPlans')) || [];
+
+
+        let currentRecipeIngredients = []; // Temporarily holds ingredients for the recipe being created/edited
+
+        const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+        const MEALS = ['breakfast', 'lunch', 'dinner', 'snacks'];
+
+
+        // --- Initialisierung ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFoodItems(); // Lädt Lebensmittel in die Tabelle "Lebensmittel verwalten"
+            populateIngredientSelect(); // Füllt das Dropdown für Zutaten in "Rezept erstellen"
+            loadRecipes(); // Lädt gespeicherte Rezepte in die Tabelle "Gespeicherte Rezepte"
+            populateMenuPlanSelects(); // Füllt die Dropdowns für den Menüplan
+            updateMenuCalculations(); // Initial calculation for menu plan
+
+
+            // Event listener for food-unit to show/hide weightPerPiece input
+            document.getElementById('food-unit').addEventListener('change', (event) => {
+                const weightPerPieceGroup = document.getElementById('food-weight-per-piece-group');
+                if (event.target.value === 'stueck') {
+                    weightPerPieceGroup.style.display = 'block';
+                } else {
+                    weightPerPieceGroup.style.display = 'none';
+                    document.getElementById('food-weight-per-piece').value = ''; // Clear value
+                }
+            });
+        });
+
+        // --- Tab Navigation ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector(`.nav-tab[onclick="switchTab('${tabId}')"]`).classList.add('active');
+
+            // Specific actions when switching tabs
+            if (tabId === 'create-recipe') {
+                populateIngredientSelect();
+                calculateRecipeTotals(); // Recalculate in case portions changed
+            } else if (tabId === 'view-recipes') {
+                loadRecipes(); // Ensure recipes are up-to-date
+                hideRecipeDetails(); // Hide details view when switching to main recipe list
+            } else if (tabId === 'manage-food') {
+                loadFoodItems(); // Ensure food list is up-to-date
+                clearFoodForm(); // Clear form when returning to it
+            } else if (tabId === 'plan-menu') {
+                populateMenuPlanSelects();
+                updateMenuCalculations();
+                document.getElementById('shoppingListOutput').style.display = 'none';
+                document.getElementById('savedMenuPlanList').style.display = 'none';
+            }
+        }
+
+        // --- Lebensmittelverwaltung (Tab 1) ---
+
+        function generateFoodId(name) {
+            return 'f_' + name.toLowerCase().replace(/[^a-z0-9]/g, '_') + '_' + Date.now();
+        }
+
+        function addOrUpdateFood() {
+            const foodId = document.getElementById('food-name').dataset.editId; // Check if editing
+            const category = document.getElementById('food-category').value;
+            const name = document.getElementById('food-name').value.trim();
+            const preferredUnit = document.getElementById('food-unit').value;
+            const weightPerPieceInGram = preferredUnit === 'stueck' ? parseFloat(document.getElementById('food-weight-per-piece').value) : null;
+            const calories = parseFloat(document.getElementById('food-calories').value);
+            const protein = parseFloat(document.getElementById('food-protein').value);
+            const carbs = parseFloat(document.getElementById('food-carbs').value);
+            const fat = parseFloat(document.getElementById('food-fat').value);
+
+            // Allow null for nutrition values if not provided, but ensure they are numbers if provided
+            const finalCalories = isNaN(calories) ? null : calories;
+            const finalProtein = isNaN(protein) ? null : protein;
+            const finalCarbs = isNaN(carbs) ? null : carbs;
+            const finalFat = isNaN(fat) ? null : fat;
+
+
+            if (!name || (preferredUnit === 'stueck' && (isNaN(weightPerPieceInGram) || weightPerPieceInGram <= 0))) {
+                alert('Bitte Lebensmittelname und bei Einheit "Stück" das Gewicht pro Stück korrekt ausfüllen.');
+                return;
+            }
+
+            if (foodId) {
+                // Update existing food item
+                const foodIndex = FOOD_DATABASE.findIndex(food => food.id === foodId);
+                if (foodIndex !== -1) {
+                    FOOD_DATABASE[foodIndex] = {
+                        id: foodId,
+                        category, name, preferredUnit, weightPerPieceInGram,
+                        calories: finalCalories, protein: finalProtein, carbs: finalCarbs, fat: finalFat
+                    };
+                    alert('Lebensmittel erfolgreich aktualisiert!');
+                }
+            } else {
+                // Add new food item
+                if (FOOD_DATABASE.some(food => food.name.toLowerCase() === name.toLowerCase())) {
+                    alert('Ein Lebensmittel mit diesem Namen existiert bereits. Bitte einen anderen Namen wählen oder den bestehenden bearbeiten.');
+                    return;
+                }
+                const newFood = {
+                    id: generateFoodId(name),
+                    category, name, preferredUnit, weightPerPieceInGram,
+                    calories: finalCalories, protein: finalProtein, carbs: finalCarbs, fat: finalFat
+                };
+                FOOD_DATABASE.push(newFood);
+                alert('Lebensmittel erfolgreich hinzugefügt!');
+            }
+
+            localStorage.setItem('foodDatabase', JSON.stringify(FOOD_DATABASE));
+            loadFoodItems();
+            populateIngredientSelect(); // Update ingredient select dropdown
+            populateMenuPlanSelects(); // Update menu plan dropdowns
+            clearFoodForm();
+        }
+
+        function loadFoodItems() {
+            const tableBody = document.getElementById('foodTableBody');
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            // Sort by category and then by name
+            const sortedFood = [...FOOD_DATABASE].sort((a, b) => {
+                if (a.category < b.category) return -1;
+                if (a.category > b.category) return 1;
+                return a.name.localeCompare(b.name);
+            });
+
+            sortedFood.forEach(food => {
+                const row = tableBody.insertRow();
+                row.insertCell().textContent = food.category;
+                row.insertCell().textContent = food.name;
+                row.insertCell().textContent = food.preferredUnit;
+                row.insertCell().textContent = food.weightPerPieceInGram !== null ? food.weightPerPieceInGram.toFixed(1) + ' g' : '-';
+                row.insertCell().textContent = food.calories !== null ? food.calories.toFixed(1) : 'N/A';
+                row.insertCell().textContent = food.protein !== null ? food.protein.toFixed(1) : 'N/A';
+                row.insertCell().textContent = food.carbs !== null ? food.carbs.toFixed(1) : 'N/A';
+                row.insertCell().textContent = food.fat !== null ? food.fat.toFixed(1) : 'N/A';
+
+                const actionsCell = row.insertCell();
+                const editBtn = document.createElement('button');
+                editBtn.textContent = 'Bearbeiten';
+                editBtn.className = 'btn btn-secondary btn-sm';
+                editBtn.onclick = () => editFoodItem(food.id);
+                actionsCell.appendChild(editBtn);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Löschen';
+                deleteBtn.className = 'btn btn-danger btn-sm';
+                deleteBtn.style.marginLeft = '5px';
+                deleteBtn.onclick = () => deleteFoodItem(food.id);
+                actionsCell.appendChild(deleteBtn);
+            });
+        }
+
+        function editFoodItem(foodId) {
+            const food = FOOD_DATABASE.find(f => f.id === foodId);
+            if (food) {
+                document.getElementById('food-category').value = food.category;
+                document.getElementById('food-name').value = food.name;
+                document.getElementById('food-name').dataset.editId = food.id; // Store ID for update
+                document.getElementById('food-unit').value = food.preferredUnit;
+                document.getElementById('food-calories').value = food.calories !== null ? food.calories : '';
+                document.getElementById('food-protein').value = food.protein !== null ? food.protein : '';
+                document.getElementById('food-carbs').value = food.carbs !== null ? food.carbs : '';
+                document.getElementById('food-fat').value = food.fat !== null ? food.fat : '';
+
+                const weightPerPieceGroup = document.getElementById('food-weight-per-piece-group');
+                if (food.preferredUnit === 'stueck') {
+                    weightPerPieceGroup.style.display = 'block';
+                    document.getElementById('food-weight-per-piece').value = food.weightPerPieceInGram !== null ? food.weightPerPieceInGram : '';
+                } else {
+                    weightPerPieceGroup.style.display = 'none';
+                    document.getElementById('food-weight-per-piece').value = '';
+                }
+
+                document.querySelector('#manage-food .btn-primary').textContent = 'Änderungen speichern';
+            }
+        }
+
+        function deleteFoodItem(foodId) {
+            if (confirm('Sind Sie sicher, dass Sie dieses Lebensmittel löschen möchten? Dadurch wird es auch aus allen Rezepten und Menüplänen entfernt.')) {
+                FOOD_DATABASE = FOOD_DATABASE.filter(food => food.id !== foodId);
+                
+                // Also remove ingredient from existing recipes
+                RECIPES.forEach(recipe => {
+                    recipe.ingredients = recipe.ingredients.filter(ing => ing.foodId !== foodId);
+                    // Re-calculate totals for affected recipes (optional, but good for data integrity)
+                    let newTotalCost = 0;
+                    let newTotalCalories = 0;
+                    let newTotalProtein = 0;
+                    let newTotalCarbs = 0;
+                    let newTotalFat = 0;
+                    recipe.ingredients.forEach(ing => {
+                        newTotalCost += ing.calculatedCost;
+                        newTotalCalories += ing.calculatedCalories;
+                        newTotalProtein += ing.calculatedProtein;
+                        newTotalCarbs += ing.calculatedCarbs;
+                        newTotalFat += ing.calculatedFat;
+                    });
+                    recipe.totals = {
+                        cost: newTotalCost,
+                        calories: newTotalCalories,
+                        protein: newTotalProtein,
+                        carbs: newTotalCarbs,
+                        fat: newTotalFat
+                    };
+                });
+                // Remove recipes that might become empty
+                RECIPES = RECIPES.filter(recipe => recipe.ingredients.length > 0);
+
+                // No direct impact on menu plans, as they reference recipe IDs. If a recipe is deleted,
+                // the menu plan dropdown will simply show a blank for that slot.
+
+                localStorage.setItem('foodDatabase', JSON.stringify(FOOD_DATABASE));
+                localStorage.setItem('recipes', JSON.stringify(RECIPES)); // Update recipes
+                
+                loadFoodItems();
+                populateIngredientSelect(); // Update ingredient select dropdown
+                populateMenuPlanSelects(); // Update menu plan dropdowns
+                loadRecipes(); // Refresh recipe list in case recipes changed
+                alert('Lebensmittel erfolgreich gelöscht! Zugehörige Rezeptzutaten wurden entfernt.');
+            }
+        }
+
+        function clearFoodForm() {
+            document.getElementById('food-name').value = '';
+            document.getElementById('food-name').dataset.editId = ''; // Clear edit ID
+            document.getElementById('food-category').value = 'Fleisch & Geflügel';
+            document.getElementById('food-unit').value = 'gram';
+            document.getElementById('food-weight-per-piece').value = '';
+            document.getElementById('food-weight-per-piece-group').style.display = 'none';
+            document.getElementById('food-calories').value = '';
+            document.getElementById('food-protein').value = '';
+            document.getElementById('food-carbs').value = '';
+            document.getElementById('food-fat').value = '';
+            document.querySelector('#manage-food .btn-primary').textContent = 'Lebensmittel speichern';
+        }
+
+        // --- Rezept erstellen (Tab 2) ---
+
+        function populateIngredientSelect() {
+            const select = document.getElementById('ingredient-select');
+            select.innerHTML = '<option value="">-- Lebensmittel auswählen --</option>'; // Clear existing options
+
+            // Sort food items alphabetically for the dropdown
+            const sortedFood = [...FOOD_DATABASE].sort((a, b) => a.name.localeCompare(b.name));
+
+            // Group by category if desired, or just list them
+            sortedFood.forEach(food => {
+                const option = document.createElement('option');
+                option.value = food.id;
+                option.textContent = `${food.name} (${food.category})`;
+                select.appendChild(option);
+            });
+        }
+
+        function updateIngredientUnit() {
+            const selectedFoodId = document.getElementById('ingredient-select').value;
+            const food = FOOD_DATABASE.find(f => f.id === selectedFoodId);
+            const unitSelect = document.getElementById('ingredient-unit');
+
+            // Reset unit select
+            unitSelect.innerHTML = `
+                <option value="gram">Gramm</option>
+                <option value="kilogram">Kilogramm</option>
+                <option value="liter">Liter</option>
+                <option value="milliliter">Milliliter</option>
+                <option value="stueck">Stück</option>
+            `;
+
+            if (food && food.preferredUnit) {
+                unitSelect.value = food.preferredUnit;
+            }
+        }
+
+        function addIngredient() {
+            const selectedFoodId = document.getElementById('ingredient-select').value;
+            const quantity = parseFloat(document.getElementById('ingredient-quantity').value);
+            const unit = document.getElementById('ingredient-unit').value;
+            const price = parseFloat(document.getElementById('ingredient-price').value);
+
+            if (!selectedFoodId || isNaN(quantity) || quantity <= 0 || isNaN(price) || price < 0) {
+                alert('Bitte wählen Sie ein Lebensmittel, geben Sie eine gültige Menge und einen gültigen Preis ein.');
+                return;
+            }
+
+            const food = FOOD_DATABASE.find(f => f.id === selectedFoodId);
+            if (!food) {
+                alert('Ausgewähltes Lebensmittel nicht gefunden.');
+                return;
+            }
+            if (food.calories === null || food.protein === null || food.carbs === null || food.fat === null) {
+                alert(`Warnung: Für "${food.name}" sind nicht alle Nährwerte hinterlegt. Bitte unter "Lebensmittel verwalten" nachtragen.`);
+                // Allow adding, but warn user
+            }
+
+            // Calculate base quantity in grams/milliliters for nutrition
+            let baseQuantityInGramsOrMl;
+            
+            if (unit === 'kilogram') {
+                baseQuantityInGramsOrMl = quantity * 1000;
+            } else if (unit === 'liter') {
+                baseQuantityInGramsOrMl = quantity * 1000;
+            } else if (unit === 'stueck') {
+                if (food.weightPerPieceInGram === null || food.weightPerPieceInGram <= 0) {
+                    alert(`Fehler: Für das Lebensmittel "${food.name}" ist kein Durchschnittsgewicht pro Stück hinterlegt. Bitte in der Lebensmittelverwaltung eintragen, um Nährwerte für "Stück" zu berechnen.`);
+                    return; // Prevent adding if piece weight is critical and missing
+                }
+                baseQuantityInGramsOrMl = quantity * food.weightPerPieceInGram;
+            } else { // gram, milliliter (already base units)
+                baseQuantityInGramsOrMl = quantity;
+            }
+            
+            // Calculate costs for ingredient
+            let ingredientCost;
+            if (unit === 'kilogram') {
+                ingredientCost = price * quantity; 
+            } else if (unit === 'liter') {
+                ingredientCost = price * quantity;
+            } else if (unit === 'stueck') {
+                ingredientCost = price * quantity;
+            } else { // gram, milliliter
+                ingredientCost = price * quantity;
+            }
+
+
+            currentRecipeIngredients.push({
+                foodId: food.id,
+                name: food.name,
+                category: food.category, // Storing category for display if needed
+                quantity,
+                unit,
+                pricePerUnit: price, // Store original price entry
+                baseQuantityInGramsOrMl,
+                calculatedCost: ingredientCost,
+                calculatedCalories: food.calories !== null ? food.calories * multiplier : 0,
+                calculatedProtein: food.protein !== null ? food.protein * multiplier : 0,
+                calculatedCarbs: food.carbs !== null ? food.carbs * multiplier : 0,
+                calculatedFat: food.fat !== null ? food.fat * multiplier : 0
+            });
+
+            renderCurrentIngredients();
+            calculateRecipeTotals();
+            clearIngredientForm();
+        }
+
+        function renderCurrentIngredients() {
+            const tableBody = document.getElementById('currentIngredientsTableBody');
+            tableBody.innerHTML = '';
+
+            currentRecipeIngredients.forEach((ing, index) => {
+                const row = tableBody.insertRow();
+                row.insertCell().textContent = ing.name;
+                row.insertCell().textContent = ing.quantity.toFixed(ing.unit === 'stueck' ? 0 : 2);
+                row.insertCell().textContent = ing.unit;
+                row.insertCell().textContent = ing.calculatedCost.toFixed(2) + ' €';
+                row.insertCell().textContent = ing.calculatedCalories.toFixed(0);
+                row.insertCell().textContent = ing.calculatedProtein.toFixed(1);
+                row.insertCell().textContent = ing.calculatedCarbs.toFixed(1);
+                row.insertCell().textContent = ing.calculatedFat.toFixed(1);
+
+                const actionsCell = row.insertCell();
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'X';
+                deleteBtn.className = 'btn btn-danger btn-sm';
+                deleteBtn.onclick = () => removeIngredient(index);
+                actionsCell.appendChild(deleteBtn);
+            });
+        }
+
+        function removeIngredient(index) {
+            currentRecipeIngredients.splice(index, 1);
+            renderCurrentIngredients();
+            calculateRecipeTotals();
+        }
+
+        function clearIngredientForm() {
+            document.getElementById('ingredient-select').value = '';
+            document.getElementById('ingredient-quantity').value = '';
+            document.getElementById('ingredient-unit').value = 'gram';
+            document.getElementById('ingredient-price').value = '';
+        }
+
+        function calculateRecipeTotals() {
+            const portions = parseInt(document.getElementById('recipe-portions').value) || 1;
+            let totalCost = 0;
+            let totalCalories = 0;
+            let totalProtein = 0;
+            let totalCarbs = 0;
+            let totalFat = 0;
+
+            currentRecipeIngredients.forEach(ing => {
+                totalCost += ing.calculatedCost;
+                totalCalories += ing.calculatedCalories;
+                totalProtein += ing.calculatedProtein;
+                totalCarbs += ing.calculatedCarbs;
+                totalFat += ing.calculatedFat;
+            });
+
+            document.getElementById('total-cost').textContent = totalCost.toFixed(2) + ' €';
+            document.getElementById('cost-per-portion').textContent = (totalCost / portions).toFixed(2) + ' €';
+            document.getElementById('total-calories').textContent = totalCalories.toFixed(0) + ' kcal';
+            document.getElementById('calories-per-portion').textContent = (totalCalories / portions).toFixed(0) + ' kcal';
+            document.getElementById('total-protein').textContent = totalProtein.toFixed(1) + ' g';
+            document.getElementById('protein-per-portion').textContent = (totalProtein / portions).toFixed(1) + ' g';
+            document.getElementById('total-carbs').textContent = totalCarbs.toFixed(1) + ' g';
+            document.getElementById('carbs-per-portion').textContent = (totalCarbs / portions).toFixed(1) + ' g';
+            document.getElementById('total-fat').textContent = totalFat.toFixed(1) + ' g';
+            document.getElementById('fat-per-portion').textContent = (totalFat / portions).toFixed(1) + ' g';
+        }
+
+        function saveRecipe() {
+            const recipeName = document.getElementById('recipe-name').value.trim();
+            const portions = parseInt(document.getElementById('recipe-portions').value);
+
+            if (!recipeName) {
+                alert('Bitte geben Sie einen Rezeptnamen ein.');
+                return;
+            }
+            if (currentRecipeIngredients.length === 0) {
+                alert('Bitte fügen Sie mindestens eine Zutat hinzu.');
+                return;
+            }
+            if (portions <= 0 || isNaN(portions)) {
+                alert('Bitte geben Sie eine gültige Anzahl von Portionen ein (mindestens 1).');
+                return;
+            }
+
+            // Check for duplicate recipe name
+            if (RECIPES.some(r => r.name.toLowerCase() === recipeName.toLowerCase())) {
+                alert('Ein Rezept mit diesem Namen existiert bereits. Bitte wählen Sie einen anderen Namen.');
+                return;
+            }
+
+            const totalCost = parseFloat(document.getElementById('total-cost').textContent.replace(' €', ''));
+            const totalCalories = parseFloat(document.getElementById('total-calories').textContent.replace(' kcal', ''));
+            const totalProtein = parseFloat(document.getElementById('total-protein').textContent.replace(' g', ''));
+            const totalCarbs = parseFloat(document.getElementById('total-carbs').textContent.replace(' g', ''));
+            const totalFat = parseFloat(document.getElementById('total-fat').textContent.replace(' g', ''));
+
+            const newRecipe = {
+                id: 'r_' + Date.now(),
+                name: recipeName,
+                portions: portions,
+                ingredients: JSON.parse(JSON.stringify(currentRecipeIngredients)), // Deep copy
+                totals: {
+                    cost: totalCost,
+                    calories: totalCalories,
+                    protein: totalProtein,
+                    carbs: totalCarbs,
+                    fat: totalFat
+                }
+            };
+
+            RECIPES.push(newRecipe);
+            localStorage.setItem('recipes', JSON.stringify(RECIPES));
+            alert('Rezept erfolgreich gespeichert!');
+            resetRecipeForm();
+            loadRecipes(); // Update the saved recipes tab
+            populateMenuPlanSelects(); // Update menu plan dropdowns
+            switchTab('view-recipes'); // Automatically switch to view saved recipes
+        }
+
+        function resetRecipeForm() {
+            document.getElementById('recipe-name').value = '';
+            document.getElementById('recipe-portions').value = 1;
+            currentRecipeIngredients = [];
+            renderCurrentIngredients();
+            calculateRecipeTotals(); // Reset totals display
+            clearIngredientForm();
+        }
+
+        // --- Gespeicherte Rezepte (Tab 3) ---
+
+        function loadRecipes() {
+            const tableBody = document.getElementById('savedRecipesTableBody');
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            // Sort recipes alphabetically by name
+            const sortedRecipes = [...RECIPES].sort((a, b) => a.name.localeCompare(b.name));
+
+            sortedRecipes.forEach(recipe => {
+                const row = tableBody.insertRow();
+                row.dataset.recipeId = recipe.id; // Store ID for detail view
+
+                row.insertCell().textContent = recipe.name;
+                row.insertCell().textContent = recipe.portions;
+                row.insertCell().textContent = recipe.totals.cost.toFixed(2) + ' €';
+                row.insertCell().textContent = (recipe.totals.cost / recipe.portions).toFixed(2) + ' €';
+                row.insertCell().textContent = (recipe.totals.calories / recipe.portions).toFixed(0) + ' kcal';
+
+                const actionsCell = row.insertCell();
+                const viewBtn = document.createElement('button');
+                viewBtn.textContent = 'Details';
+                viewBtn.className = 'btn btn-secondary btn-sm';
+                viewBtn.style.marginRight = '5px';
+                viewBtn.onclick = (event) => {
+                    event.stopPropagation(); // Prevent row click from firing
+                    showRecipeDetails(recipe.id);
+                };
+                actionsCell.appendChild(viewBtn);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Löschen';
+                deleteBtn.className = 'btn btn-danger btn-sm';
+                deleteBtn.onclick = (event) => {
+                    event.stopPropagation(); // Prevent row click from firing
+                    deleteRecipe(recipe.id);
+                };
+                actionsCell.appendChild(deleteBtn);
+            });
+        }
+
+        function showRecipeDetails(recipeId) {
+            const recipe = RECIPES.find(r => r.id === recipeId);
+            const detailView = document.getElementById('recipeDetailView');
+            const detailIngredientsList = document.getElementById('detailIngredientsList');
+            document.getElementById('recipeTextOutput').style.display = 'none'; // Hide text output when showing details
+
+            if (recipe) {
+                document.getElementById('detailRecipeName').textContent = recipe.name;
+                document.getElementById('detailPortions').textContent = recipe.portions;
+                document.getElementById('detailTotalCost').textContent = recipe.totals.cost.toFixed(2) + ' €';
+                document.getElementById('detailCostPerPortion').textContent = (recipe.totals.cost / recipe.portions).toFixed(2) + ' €';
+                
+                document.getElementById('detailTotalCalories').textContent = recipe.totals.calories.toFixed(0);
+                document.getElementById('detailTotalProtein').textContent = recipe.totals.protein.toFixed(1);
+                document.getElementById('detailTotalCarbs').textContent = recipe.totals.carbs.toFixed(1);
+                document.getElementById('detailTotalFat').textContent = recipe.totals.fat.toFixed(1);
+
+                document.getElementById('detailCaloriesPerPortion').textContent = (recipe.totals.calories / recipe.portions).toFixed(0);
+                document.getElementById('detailProteinPerPortion').textContent = (recipe.totals.protein / recipe.portions).toFixed(1);
+                document.getElementById('detailCarbsPerPortion').textContent = (recipe.totals.carbs / recipe.portions).toFixed(1);
+                document.getElementById('detailFatPerPortion').textContent = (recipe.totals.fat / recipe.portions).toFixed(1);
+
+                detailIngredientsList.innerHTML = '';
+                recipe.ingredients.forEach(ing => {
+                    const li = document.createElement('li');
+                    li.textContent = `${ing.name}: ${ing.quantity.toFixed(ing.unit === 'stueck' ? 0 : 2)} ${ing.unit} | Kosten: ${ing.calculatedCost.toFixed(2)} € | kcal: ${ing.calculatedCalories.toFixed(0)} | Protein: ${ing.calculatedProtein.toFixed(1)}g | KH: ${ing.calculatedCarbs.toFixed(1)}g | Fett: ${ing.calculatedFat.toFixed(1)}g`;
+                    detailIngredientsList.appendChild(li);
+                });
+
+                detailView.dataset.currentRecipeId = recipe.id; // Store for export function
+                detailView.style.display = 'block';
+            } else {
+                alert('Rezept nicht gefunden.');
+            }
+        }
+
+        function hideRecipeDetails() {
+            document.getElementById('recipeDetailView').style.display = 'none';
+            document.getElementById('recipeTextOutput').style.display = 'none'; // Hide text output too
+            document.getElementById('recipeDetailView').dataset.currentRecipeId = ''; // Clear current recipe ID
+        }
+
+        function deleteRecipe(recipeId) {
+            if (confirm('Sind Sie sicher, dass Sie dieses Rezept löschen möchten? Es wird auch aus allen Menüplänen entfernt, die es verwenden.')) {
+                RECIPES = RECIPES.filter(recipe => recipe.id !== recipeId);
+                
+                // Also remove recipe from any saved menu plans
+                SAVED_MENU_PLANS.forEach(plan => {
+                    DAYS.forEach(day => {
+                        MEALS.forEach(meal => {
+                            if (plan.menu[day][meal] === recipeId) {
+                                plan.menu[day][meal] = ''; // Set to empty if recipe is deleted
+                            }
+                        });
+                    });
+                });
+
+                localStorage.setItem('recipes', JSON.stringify(RECIPES));
+                localStorage.setItem('savedMenuPlans', JSON.stringify(SAVED_MENU_PLANS)); // Update menu plans
+                
+                loadRecipes();
+                populateMenuPlanSelects(); // Update menu plan dropdowns
+                updateMenuCalculations(); // Recalculate if active plan was affected
+                hideRecipeDetails(); // Hide details if the deleted recipe was shown
+                alert('Rezept erfolgreich gelöscht! Menüpläne wurden aktualisiert.');
+            }
+        }
+
+        function exportRecipeText() {
+            const currentRecipeId = document.getElementById('recipeDetailView').dataset.currentRecipeId;
+            const recipe = RECIPES.find(r => r.id === currentRecipeId);
+            const textOutputElement = document.getElementById('recipeTextOutput');
+
+            if (!recipe) {
+                alert('Kein Rezept zum Exportieren ausgewählt.');
+                return;
+            }
+
+            let text = `--- Rezept: ${recipe.name} ---\n`;
+            text += `Portionen: ${recipe.portions}\n\n`;
+            text += `Nährwerte gesamt:\n`;
+            text += `  Kalorien: ${recipe.totals.calories.toFixed(0)} kcal\n`;
+            text += `  Protein: ${recipe.totals.protein.toFixed(1)} g\n`;
+            text += `  Kohlenhydrate: ${recipe.totals.carbs.toFixed(1)} g\n`;
+            text += `  Fett: ${recipe.totals.fat.toFixed(1)} g\n\n`;
+            text += `Nährwerte pro Portion:\n`;
+            text += `  Kalorien: ${(recipe.totals.calories / recipe.portions).toFixed(0)} kcal\n`;
+            text += `  Protein: ${(recipe.totals.protein / recipe.portions).toFixed(1)} g\n`;
+            text += `  Kohlenhydrate: ${(recipe.totals.carbs / recipe.portions).toFixed(1)} g\n`;
+            text += `  Fett: ${(recipe.totals.fat / recipe.portions).toFixed(1)} g\n\n`;
+            text += `Kosten gesamt: ${recipe.totals.cost.toFixed(2)} €\n`;
+            text += `Kosten pro Portion: ${(recipe.totals.cost / recipe.portions).toFixed(2)} €\n\n`;
+            text += `Zutaten:\n`;
+            recipe.ingredients.forEach(ing => {
+                text += `  - ${ing.name}: ${ing.quantity.toFixed(ing.unit === 'stueck' ? 0 : 2)} ${ing.unit} (Kosten: ${ing.calculatedCost.toFixed(2)} € | kcal: ${ing.calculatedCalories.toFixed(0)} | Protein: ${ing.calculatedProtein.toFixed(1)}g | KH: ${ing.calculatedCarbs.toFixed(1)}g | Fett: ${ing.calculatedFat.toFixed(1)}g)\n`;
+            });
+            text += `\n---------------------------------------\n`;
+
+            textOutputElement.value = text;
+            textOutputElement.style.display = 'block';
+            textOutputElement.select(); // Select the text for easy copying
+            alert('Rezepttext generiert! Sie können ihn jetzt kopieren.');
+        }
+
+        // --- Menüplan erstellen (Tab 4) ---
+
+        function populateMenuPlanSelects() {
+            DAYS.forEach(day => {
+                MEALS.forEach(meal => {
+                    const selectElement = document.getElementById(`${day}-${meal}`);
+                    selectElement.innerHTML = '<option value="">-- Rezept auswählen --</option>'; // Clear existing options
+                    
+                    const sortedRecipes = [...RECIPES].sort((a,b) => a.name.localeCompare(b.name));
+
+                    sortedRecipes.forEach(recipe => {
+                        const option = document.createElement('option');
+                        option.value = recipe.id;
+                        option.textContent = recipe.name;
+                        selectElement.appendChild(option);
+                    });
+                });
+            });
+        }
+
+        function updateMenuCalculations() {
+            const numResidents = parseInt(document.getElementById('num-residents').value) || 1;
+            
+            let weeklyTotalCost = 0;
+            let weeklyTotalCalories = 0;
+            let weeklyTotalProtein = 0;
+            let weeklyTotalCarbs = 0;
+            let weeklyTotalFat = 0;
+
+            DAYS.forEach(day => {
+                MEALS.forEach(meal => {
+                    const recipeId = document.getElementById(`${day}-${meal}`).value;
+                    if (recipeId) {
+                        const recipe = RECIPES.find(r => r.id === recipeId);
+                        if (recipe) {
+                            // Scale recipe totals based on residents vs recipe portions
+                            const scaleFactor = numResidents / recipe.portions;
+                            weeklyTotalCost += recipe.totals.cost * scaleFactor;
+                            weeklyTotalCalories += recipe.totals.calories * scaleFactor;
+                            weeklyTotalProtein += recipe.totals.protein * scaleFactor;
+                            weeklyTotalCarbs += recipe.totals.carbs * scaleFactor;
+                            weeklyTotalFat += recipe.totals.fat * scaleFactor;
+                        }
+                    }
+                });
+            });
+
+            document.getElementById('weekly-total-cost').textContent = weeklyTotalCost.toFixed(2) + ' €';
+            document.getElementById('weekly-total-calories').textContent = weeklyTotalCalories.toFixed(0) + ' kcal';
+            document.getElementById('weekly-total-protein').textContent = weeklyTotalProtein.toFixed(1) + ' g';
+            document.getElementById('weekly-total-carbs').textContent = weeklyTotalCarbs.toFixed(1) + ' g';
+            document.getElementById('weekly-total-fat').textContent = weeklyTotalFat.toFixed(1) + ' g';
+
+            const totalMealsPerWeek = DAYS.length * MEALS.length; // 7 days * 4 meals/day = 28 meal slots
+            
+            const avgDailyCaloriesResident = (weeklyTotalCalories / 7) / numResidents;
+            const avgDailyProteinResident = (weeklyTotalProtein / 7) / numResidents;
+            const avgDailyCarbsResident = (weeklyTotalCarbs / 7) / numResidents;
+            const avgDailyFatResident = (weeklyTotalFat / 7) / numResidents;
+
+            document.getElementById('avg-daily-calories-resident').textContent = avgDailyCaloriesResident.toFixed(0) + ' kcal';
+            document.getElementById('avg-daily-protein-resident').textContent = avgDailyProteinResident.toFixed(1) + ' g';
+            document.getElementById('avg-daily-carbs-resident').textContent = avgDailyCarbsResident.toFixed(1) + ' g';
+            document.getElementById('avg-daily-fat-resident').textContent = avgDailyFatResident.toFixed(1) + ' g';
+        }
+
+        function generateShoppingList() {
+            const numResidents = parseInt(document.getElementById('num-residents').value) || 1;
+            const shoppingList = {}; // { foodId: { name, unit, totalQuantity, totalCost } }
+            
+            DAYS.forEach(day => {
+                MEALS.forEach(meal => {
+                    const recipeId = document.getElementById(`${day}-${meal}`).value;
+                    if (recipeId) {
+                        const recipe = RECIPES.find(r => r.id === recipeId);
+                        if (recipe) {
+                            const scaleFactor = numResidents / recipe.portions;
+                            
+                            recipe.ingredients.forEach(ing => {
+                                if (!shoppingList[ing.foodId]) {
+                                    const foodDetails = FOOD_DATABASE.find(f => f.id === ing.foodId);
+                                    shoppingList[ing.foodId] = {
+                                        name: ing.name,
+                                        unit: foodDetails ? foodDetails.preferredUnit : ing.unit, // Use preferred unit from food DB if available
+                                        totalQuantity: 0,
+                                        totalCost: 0,
+                                        originalUnit: ing.unit // Store original unit for display purposes
+                                    };
+                                }
+                                // Calculate quantity in preferred unit
+                                let quantityInPreferredUnit = ing.quantity;
+                                if (ing.unit === 'gram' && shoppingList[ing.foodId].unit === 'kilogram') {
+                                    quantityInPreferredUnit /= 1000;
+                                } else if (ing.unit === 'milliliter' && shoppingList[ing.foodId].unit === 'liter') {
+                                    quantityInPreferredUnit /= 1000;
+                                } else if (ing.unit === 'kilogram' && shoppingList[ing.foodId].unit === 'gram') {
+                                    quantityInPreferredUnit *= 1000;
+                                } else if (ing.unit === 'liter' && shoppingList[ing.foodId].unit === 'milliliter') {
+                                    quantityInPreferredUnit *= 1000;
+                                }
+                                
+                                shoppingList[ing.foodId].totalQuantity += quantityInPreferredUnit * scaleFactor;
+                                shoppingList[ing.foodId].totalCost += ing.calculatedCost * scaleFactor;
+                            });
+                        }
+                    }
+                });
+            });
+
+            const shoppingListOutput = document.getElementById('generatedShoppingList');
+            shoppingListOutput.innerHTML = '';
+            
+            let totalShoppingCost = 0;
+
+            const sortedIngredients = Object.values(shoppingList).sort((a,b) => a.name.localeCompare(b.name));
+
+            sortedIngredients.forEach(item => {
+                const li = document.createElement('li');
+                let displayQuantity = item.totalQuantity;
+                let displayUnit = item.unit;
+
+                // Adjust for larger quantities for better readability
+                if (item.unit === 'gram' && item.totalQuantity >= 1000) {
+                    displayQuantity = item.totalQuantity / 1000;
+                    displayUnit = 'kg';
+                } else if (item.unit === 'milliliter' && item.totalQuantity >= 1000) {
+                    displayQuantity = item.totalQuantity / 1000;
+                    displayUnit = 'L';
+                }
+                
+                li.textContent = `${item.name}: ${displayQuantity.toFixed(displayUnit === 'stueck' ? 0 : 2)} ${displayUnit} (Gesch. Kosten: ${item.totalCost.toFixed(2)} €)`;
+                shoppingListOutput.appendChild(li);
+                totalShoppingCost += item.totalCost;
+            });
+
+            if (Object.keys(shoppingList).length === 0) {
+                const li = document.createElement('li');
+                li.textContent = 'Keine Zutaten im Menüplan enthalten.';
+                shoppingListOutput.appendChild(li);
+            } else {
+                const totalLi = document.createElement('li');
+                totalLi.innerHTML = `<strong>Gesamtkosten Einkaufsliste: ${totalShoppingCost.toFixed(2)} €</strong>`;
+                shoppingListOutput.appendChild(totalLi);
+            }
+
+            document.getElementById('shoppingListOutput').style.display = 'block';
+        }
+
+        function exportShoppingListText() {
+            const numResidents = parseInt(document.getElementById('num-residents').value) || 1;
+            const shoppingList = {}; 
+            
+            DAYS.forEach(day => {
+                MEALS.forEach(meal => {
+                    const recipeId = document.getElementById(`${day}-${meal}`).value;
+                    if (recipeId) {
+                        const recipe = RECIPES.find(r => r.id === recipeId);
+                        if (recipe) {
+                            const scaleFactor = numResidents / recipe.portions;
+                            
+                            recipe.ingredients.forEach(ing => {
+                                if (!shoppingList[ing.foodId]) {
+                                    const foodDetails = FOOD_DATABASE.find(f => f.id === ing.foodId);
+                                    shoppingList[ing.foodId] = {
+                                        name: ing.name,
+                                        unit: foodDetails ? foodDetails.preferredUnit : ing.unit,
+                                        totalQuantity: 0,
+                                        totalCost: 0
+                                    };
+                                }
+                                let quantityInPreferredUnit = ing.quantity;
+                                if (ing.unit === 'gram' && shoppingList[ing.foodId].unit === 'kilogram') {
+                                    quantityInPreferredUnit /= 1000;
+                                } else if (ing.unit === 'milliliter' && shoppingList[ing.foodId].unit === 'liter') {
+                                    quantityInPreferredUnit /= 1000;
+                                } else if (ing.unit === 'kilogram' && shoppingList[ing.foodId].unit === 'gram') {
+                                    quantityInPreferredUnit *= 1000;
+                                } else if (ing.unit === 'liter' && shoppingList[ing.foodId].unit === 'milliliter') {
+                                    quantityInPreferredUnit *= 1000;
+                                }
+                                
+                                shoppingList[ing.foodId].totalQuantity += quantityInPreferredUnit * scaleFactor;
+                                shoppingList[ing.foodId].totalCost += ing.calculatedCost * scaleFactor;
+                            });
+                        }
+                    }
+                });
+            });
+
+            let shoppingListText = `--- Einkaufsliste für die Woche (für ${numResidents} Bewohner) ---\n\n`;
+            let totalShoppingCost = 0;
+
+            const sortedIngredients = Object.values(shoppingList).sort((a,b) => a.name.localeCompare(b.name));
+
+            if (Object.keys(shoppingList).length === 0) {
+                shoppingListText += 'Keine Zutaten im Menüplan enthalten.\n';
+            } else {
+                sortedIngredients.forEach(item => {
+                    let displayQuantity = item.totalQuantity;
+                    let displayUnit = item.unit;
+
+                    if (item.unit === 'gram' && item.totalQuantity >= 1000) {
+                        displayQuantity = item.totalQuantity / 1000;
+                        displayUnit = 'kg';
+                    } else if (item.unit === 'milliliter' && item.totalQuantity >= 1000) {
+                        displayQuantity = item.totalQuantity / 1000;
+                        displayUnit = 'L';
+                    }
+                    shoppingListText += `- ${item.name}: ${displayQuantity.toFixed(displayUnit === 'stueck' ? 0 : 2)} ${displayUnit} (Gesch. Kosten: ${item.totalCost.toFixed(2)} €)\n`;
+                    totalShoppingCost += item.totalCost;
+                });
+                shoppingListText += `\nGesamtkosten Einkaufsliste: ${totalShoppingCost.toFixed(2)} €\n`;
+            }
+            shoppingListText += `\n---------------------------------------\n`;
+
+            const textOutputElement = document.getElementById('shoppingListTextOutput');
+            textOutputElement.value = shoppingListText;
+            textOutputElement.style.display = 'block';
+            textOutputElement.select();
+            alert('Einkaufsliste als Text generiert! Sie können ihn jetzt kopieren.');
+        }
+
+
+        function saveMenuPlan() {
+            const menuPlanName = document.getElementById('menu-plan-name').value.trim();
+            const numResidents = parseInt(document.getElementById('num-residents').value);
+
+            if (!menuPlanName) {
+                alert('Bitte geben Sie einen Namen für den Menüplan ein.');
+                return;
+            }
+
+            const currentMenu = {};
+            DAYS.forEach(day => {
+                currentMenu[day] = {};
+                MEALS.forEach(meal => {
+                    currentMenu[day][meal] = document.getElementById(`${day}-${meal}`).value;
+                });
+            });
+
+            const existingPlanIndex = SAVED_MENU_PLANS.findIndex(plan => plan.name.toLowerCase() === menuPlanName.toLowerCase());
+
+            const newPlan = {
+                id: 'mp_' + Date.now(),
+                name: menuPlanName,
+                residents: numResidents,
+                menu: currentMenu
+            };
+
+            if (existingPlanIndex !== -1) {
+                if (confirm(`Ein Menüplan mit dem Namen "${menuPlanName}" existiert bereits. Möchten Sie ihn überschreiben?`)) {
+                    SAVED_MENU_PLANS[existingPlanIndex] = newPlan;
+                    alert('Menüplan erfolgreich aktualisiert!');
+                } else {
+                    return;
+                }
+            } else {
+                SAVED_MENU_PLANS.push(newPlan);
+                alert('Menüplan erfolgreich gespeichert!');
+            }
+
+            localStorage.setItem('savedMenuPlans', JSON.stringify(SAVED_MENU_PLANS));
+            loadMenuPlanList(); // Refresh the list of saved plans
+        }
+
+        function loadMenuPlanList() {
+            const menuPlanListElement = document.getElementById('menuPlanList');
+            menuPlanListElement.innerHTML = '';
+            document.getElementById('savedMenuPlanList').style.display = 'block';
+
+            if (SAVED_MENU_PLANS.length === 0) {
+                menuPlanListElement.innerHTML = '<li>Keine gespeicherten Menüpläne gefunden.</li>';
+                return;
+            }
+
+            SAVED_MENU_PLANS.sort((a,b) => a.name.localeCompare(b.name)).forEach(plan => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    ${plan.name} (für ${plan.residents} Bewohner)
+                    <button class="btn btn-primary btn-sm" style="margin-left: 10px; margin-right: 5px;" onclick="loadMenuPlan('${plan.id}')">Laden</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteMenuPlan('${plan.id}')">Löschen</button>
+                `;
+                menuPlanListElement.appendChild(li);
+            });
+        }
+
+        function loadMenuPlan(planId) {
+            const plan = SAVED_MENU_PLANS.find(p => p.id === planId);
+            if (plan) {
+                document.getElementById('menu-plan-name').value = plan.name;
+                document.getElementById('num-residents').value = plan.residents;
+
+                DAYS.forEach(day => {
+                    MEALS.forEach(meal => {
+                        document.getElementById(`${day}-${meal}`).value = plan.menu[day][meal] || '';
+                    });
+                });
+                updateMenuCalculations();
+                document.getElementById('savedMenuPlanList').style.display = 'none';
+                alert(`Menüplan "${plan.name}" geladen!`);
+            } else {
+                alert('Menüplan nicht gefunden.');
+            }
+        }
+
+        function deleteMenuPlan(planId) {
+            if (confirm('Sind Sie sicher, dass Sie diesen Menüplan löschen möchten?')) {
+                SAVED_MENU_PLANS = SAVED_MENU_PLANS.filter(plan => plan.id !== planId);
+                localStorage.setItem('savedMenuPlans', JSON.stringify(SAVED_MENU_PLANS));
+                loadMenuPlanList();
+                alert('Menüplan erfolgreich gelöscht!');
+            }
+        }
+
+        function clearMenuPlan() {
+            if (confirm('Möchten Sie den aktuellen Menüplan leeren?')) {
+                document.getElementById('menu-plan-name').value = '';
+                document.getElementById('num-residents').value = 10; // Reset to default
+                DAYS.forEach(day => {
+                    MEALS.forEach(meal => {
+                        document.getElementById(`${day}-${meal}`).value = '';
+                    });
+                });
+                updateMenuCalculations();
+                document.getElementById('shoppingListOutput').style.display = 'none';
+                alert('Menüplan geleert.');
+            }
+        }
+
+    </script>
+</body>
+</html>
